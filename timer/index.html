@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+	iframe {
+		width: 700px;
+	}
+	ins {
+		display: block;
+		text-decoration: none;
+	}
+	</style>
+</head>
+<body>
+	<iframe src="test-match.html"></iframe>
+	<iframe src="test-resize.html"></iframe>
+	<ins></ins>
+	<script>
+		var resize = function (element, target, timeout) {
+			var interval = setInterval(function () {
+				var newWidth = element.clientWidth > 640 ? element.clientWidth -= 1 : element.clientWidth += 1;
+				element.style.width = newWidth + 'px';
+			}, 1);
+
+			setTimeout(function () {
+				clearInterval(interval);
+				var iframes = document.getElementsByTagName('iframe');
+
+				for (var i = iframes.length - 1; i >= 0; i--) {
+					iframes[i].contentWindow.postMessage('stop', location);
+				}
+			}, timeout);
+		};
+
+		var iframes = document.getElementsByTagName('iframe');
+
+		for (var i = iframes.length - 1; i >= 0; i--) {
+			resize(iframes[i], 640, 10000);
+		}
+
+		var results = [];
+
+		var minimum = function (array) {
+			var minimum = Infinity;
+			for (var i = array.length - 1; i >= 0; i--) {
+				var x = array[i].result;
+				if (x < minimum) minimum = x;
+			}
+			return minimum;
+		};
+
+		var maximum = function (array) {
+			var maximum = -Infinity;
+			for (var i = array.length - 1; i >= 0; i--) {
+				var x = array[i].result;
+				if (x > maximum) maximum = x;
+			}
+			return maximum;
+		};
+
+		function compare (results) {
+			var min = minimum(results);
+			var max = maximum(results);
+
+			var difference = max - min;
+			var percent = (difference / min) * 100;
+			
+			var winner = results.filter(function (x) {
+				return x.result === min;
+			})[0];
+
+			var text = document.getElementsByTagName('ins')[0];
+			text.innerHTML = winner.name + ' is ' + percent.toFixed(2) + '% faster';
+		}
+
+		window.addEventListener('message', function(message) {
+			results.push(message.data);
+			if (results.length === iframes.length) {
+				compare(results);
+			}
+		}, false);
+	</script>
+</body>
+</html>

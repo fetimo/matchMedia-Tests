@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+	iframe {
+		width: 640px;
+	}
+	ins {
+		display: block;
+		text-decoration: none;
+	}
+	</style>
+</head>
+<body>
+	<iframe src="test-match.html"></iframe>
+	<iframe src="test-resize.html"></iframe>
+	<ins>Running tests&hellip;</ins>
+	<script>
+		var makeInterval = function (callback) {
+			var interval;
+			if (typeof requestAnimationFrame === 'function') {
+				interval = requestAnimationFrame(callback);
+			} else {
+				interval = setInterval(callback, 1);
+			}
+
+			return interval;
+		};
+
+		var resize = function (element, target, timeout) {
+			var runTest = true;
+			var cb = function () {
+				if (!runTest) {
+					return;
+				}
+				var newWidth = element.clientWidth > 640 ? element.clientWidth -= 10 : element.clientWidth += 10;
+				element.style.width = newWidth + 'px';
+				if (typeof requestAnimationFrame === 'function') { 
+					requestAnimationFrame(cb);
+				}
+			};
+
+			var interval = makeInterval(cb);
+
+			setTimeout(function () {
+				runTest = false;
+				clearInterval(interval);
+				compare();
+			}, timeout);
+		};
+
+		var iframes = document.getElementsByTagName('iframe');
+
+		for (var i = iframes.length - 1; i >= 0; i--) {
+			resize(iframes[i], 640, 10000);
+		}
+
+		function percentage () {
+			var x = [resizePoints, mmPoints],
+				min = Math.min.apply(Math, x),
+				max = Math.max.apply(Math, x),
+				diff = max - min,
+				percent = (diff / max) * 100;
+			return percent;
+		}
+
+		function compare () {
+			var text = document.getElementsByTagName('ins')[0];
+			text.innerHTML = '# of iterations: resize ' + resizePoints + ' matchMedia ' + mmPoints + ', difference of ' + percentage().toFixed(2) + '%';
+		}
+
+		var resizePoints = 0;
+		var mmPoints = 0;
+
+		window.addEventListener('message', function(message) {
+			if (message.data.name === 'resize') {
+				resizePoints++;
+			} else {
+				mmPoints++;
+			}
+		}, false);
+	</script>
+</body>
+</html>

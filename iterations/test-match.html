@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>test</title>
+</head>
+<body>
+	<h1>Match Media</h1>
+	<script>
+		'use strict';
+
+		matchMedia('(width: 640px)').addListener(function (mql) {
+		    if (mql.matches) {
+		        parent.postMessage({
+					name: 'matchMedia',
+					result: true
+				}, location);
+		    }
+		});
+	</script>
+</body>
+</html>

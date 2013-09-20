@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>test</title>
+</head>
+<body>
+	<h1>Match Media</h1>
+	<nav class="site-navigation"></nav>
+	<script>
+		'use strict';
+
+		var total = 0;
+
+		var mq = window.matchMedia('(max-width: 640px)');
+
+		mq.addListener(function(mql) {
+			var start = new Date().getTime();
+		    if (mql.matches === true) {
+		        var nav = document.getElementsByClassName('site-navigation')[0];
+		        var newNav = document.createElement('nav');
+		        nav.appendChild(newNav);
+		    }
+		    var stop = new Date().getTime();
+		    var diff = stop - start;
+		    total += diff;
+		});
+
+		window.addEventListener('message', function() {
+			parent.postMessage({
+				name: 'matchMedia',
+				result: total
+			}, location);
+		}, false);
+	</script>
+</body>
+</html>

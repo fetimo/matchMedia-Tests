@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>test</title>
+</head>
+<body>
+	<h1>Resize</h1>
+	<nav class="site-navigation"></nav>
+	<script>
+		'use strict';
+
+		var total = 0;
+
+		window.addEventListener('resize', function() {
+			var start = new Date().getTime();
+
+		    if (window.innerWidth <= 640) {
+		        var nav = document.getElementsByClassName('site-navigation')[0];
+		        var newNav = document.createElement('nav');
+		        nav.appendChild(newNav);
+		    }
+
+		    var stop = new Date().getTime();
+		    var diff = stop - start;
+		    total += diff;
+
+		}, false);
+
+		window.addEventListener('message', function() {
+			parent.postMessage({
+				name: 'resize',
+				result: total
+			}, location);
+		}, false);
+	</script>
+</body>
+</html>
